@@ -1,11 +1,11 @@
-import Anthropic from "@anthropic-ai/sdk";
+import OpenAI from "openai";
 
-const client = process.env.ANTHROPIC_API_KEY
-  ? new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY })
+const client = process.env.OPENAI_API_KEY
+  ? new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
   : null;
 
 // Balanced quality/cost for on-brand writing tasks like these.
-const MODEL = "claude-sonnet-5";
+const MODEL = "gpt-4o";
 
 type BusinessProfile = {
   name: string;
@@ -17,17 +17,18 @@ type BusinessProfile = {
 
 async function complete(system: string, user: string, fallback: string) {
   if (!client) {
-    // Demo-mode safety net when no ANTHROPIC_API_KEY is set.
+    // Demo-mode safety net when no OPENAI_API_KEY is set.
     return fallback;
   }
-  const res = await client.messages.create({
+  const res = await client.chat.completions.create({
     model: MODEL,
     max_tokens: 400,
-    system,
-    messages: [{ role: "user", content: user }],
+    messages: [
+      { role: "system", content: system },
+      { role: "user", content: user },
+    ],
   });
-  const block = res.content.find((b) => b.type === "text");
-  return block && block.type === "text" ? block.text.trim() : fallback;
+  return res.choices[0]?.message?.content?.trim() || fallback;
 }
 
 export async function generateReviewReply(
