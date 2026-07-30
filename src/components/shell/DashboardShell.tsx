@@ -10,7 +10,9 @@ import TopBar from "./TopBar";
 const NAV_KEY = "inlet.navCollapsed";
 const RAIL_KEY = "inlet.railOpen";
 
-const NAV_W_OPEN = 222;
+// Wide enough for "Reputation Management" on one line. The bucket_AI original
+// is 222, but its longest label is "Experiences".
+const NAV_W_OPEN = 254;
 const NAV_W_COLLAPSED = 68;
 const RAIL_W = 360;
 const RAIL_W_COLLAPSED = 52;

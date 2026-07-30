@@ -3,95 +3,85 @@ import { prisma } from "@/lib/prisma";
 import { getOrCreateUserAndBusiness } from "@/lib/getCurrentBusiness";
 import { GuestTicketCard } from "@/components/GuestTicketCard";
 import { AutopilotButton } from "@/components/AutopilotButton";
+import { StatTile } from "@/components/analytics/Viz";
+import { reputationInsights, type GuestRow } from "@/lib/insights";
 
 export const dynamic = "force-dynamic";
 
-type GuestRow = {
-  id: string;
-  bookingDate: string | Date;
-  reviewText: string | null;
-  reviewStatus: string;
-  reengagementStatus: string;
-};
-
 /**
- * Cards are ordered by what needs a human, not by booking date. A flagged
- * review is the one thing the autopilot deliberately refused to handle on
- * its own, so it leads the timeline. Guests whose tour hasn't happened yet
- * sort last: nothing is due on them, and sorting them first (which plain
- * bookingDate desc did) opened the page on an empty card.
+ * Cards are grouped by what they ask of a person, not by booking date.
+ *
+ * The old flat list sorted by attention rank, which put the right card first
+ * but gave no reason why. Three labelled sections say it outright: this needs
+ * you, this is ready when you are, this is done. Nothing is hidden, so the
+ * page stays scannable without a filter bar to learn.
  */
-function attentionRank(g: GuestRow, now: number): number {
-  if (g.reviewStatus === "flagged") return 0; // held for a person
-  if (g.reviewText && g.reviewStatus === "none") return 1; // review with no reply yet
-  if (g.reviewStatus === "drafted" || g.reengagementStatus === "drafted") return 2; // waiting on approval
-  if (new Date(g.bookingDate).getTime() > now) return 5; // tour hasn't happened
-  if (g.reviewStatus === "approved" || g.reengagementStatus === "approved") return 3;
-  return 4;
+type Bucket = "needsYou" | "ready" | "settled";
+
+function bucketOf(g: GuestRow, now: number): Bucket {
+  if (g.reviewStatus === "flagged") return "needsYou";
+  if (g.reviewText && g.reviewStatus === "none") return "needsYou";
+  if (g.reviewStatus === "drafted" || g.reengagementStatus === "drafted") return "ready";
+  if (new Date(g.bookingDate).getTime() > now) return "settled";
+  return "settled";
 }
 
-function Stat({
-  value,
-  label,
-  tone,
-}: {
-  value: number;
-  label: string;
-  tone: "brick" | "rust" | "ochre" | "moss";
-}) {
-  const toneClass = {
-    brick: "text-brick",
-    rust: "text-rust",
-    ochre: "text-ochre",
-    moss: "text-moss",
-  }[tone];
+const SECTIONS: { key: Bucket; title: string; hint: string }[] = [
+  {
+    key: "needsYou",
+    title: "Needs you",
+    hint: "A negative review the autopilot held back, or a review with nothing drafted yet.",
+  },
+  {
+    key: "ready",
+    title: "Ready when you are",
+    hint: "Drafted and waiting on one click.",
+  },
+  {
+    key: "settled",
+    title: "Nothing due",
+    hint: "Already sent, or the tour has not happened yet.",
+  },
+];
 
-  return (
-    <div className="glass-card rounded-tile px-4 py-3">
-      <p className={`font-display text-2xl font-semibold leading-none ${toneClass}`}>{value}</p>
-      <p className="mt-1.5 text-xs leading-tight text-ink-soft">{label}</p>
-    </div>
-  );
-}
-
-export default async function DashboardPage() {
+export default async function ReputationPage() {
   const session = await getSession();
-  const user = await getOrCreateUserAndBusiness(session!.user.sub, session!.user.email, session!.user.name);
+  const user = await getOrCreateUserAndBusiness(
+    session!.user.sub,
+    session!.user.email,
+    session!.user.name
+  );
 
-  const guests = await prisma.guest.findMany({
+  const rows = await prisma.guest.findMany({
     where: { businessId: user.business.id },
     orderBy: { bookingDate: "desc" },
   });
+  const guests = JSON.parse(JSON.stringify(rows)) as GuestRow[];
 
   const now = Date.now();
-  const ordered = [...guests].sort((a: GuestRow, b: GuestRow) => {
-    const byAttention = attentionRank(a, now) - attentionRank(b, now);
-    if (byAttention !== 0) return byAttention;
-    return new Date(b.bookingDate).getTime() - new Date(a.bookingDate).getTime();
-  });
+  const rep = reputationInsights(guests);
 
-  const heldForYou = guests.filter((g: GuestRow) => g.reviewStatus === "flagged").length;
-  const needsReview = guests.filter((g: GuestRow) => g.reviewText && g.reviewStatus === "none").length;
-  const draftsReady = guests.filter(
-    (g: GuestRow) => g.reviewStatus === "drafted" || g.reengagementStatus === "drafted"
-  ).length;
-  const alreadySent = guests.filter(
-    (g: GuestRow) => g.reviewStatus === "sent" || g.reengagementStatus === "sent"
-  ).length;
+  const grouped: Record<Bucket, GuestRow[]> = { needsYou: [], ready: [], settled: [] };
+  for (const g of guests) grouped[bucketOf(g, now)].push(g);
+  // Flagged first inside "Needs you": it is the one thing a person must read.
+  grouped.needsYou.sort((a, b) =>
+    a.reviewStatus === "flagged" ? -1 : b.reviewStatus === "flagged" ? 1 : 0
+  );
 
   return (
-    <div>
-      <div className="flex flex-wrap items-end justify-between gap-4">
+    <div className="mx-auto max-w-[1100px]">
+      <header className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <h1 className="font-display text-2xl font-semibold text-ink">Guest timeline</h1>
-          <p className="mt-1 text-sm text-ink-soft">
-            Every booking, review, and follow-up in one place, drafted automatically, sent when you say so.
+          <h1 className="text-2xl font-bold tracking-tight text-ink">Reputation Management</h1>
+          <p className="mt-1 max-w-xl text-sm leading-relaxed text-ink-soft">
+            Every review and follow-up, answered automatically where that is safe and held for you
+            where it is not.
           </p>
         </div>
         <div className="flex flex-wrap gap-3">
           <AutopilotButton
             endpoint="/api/autopilot/reviews"
-            label={`Run review autopilot${needsReview ? ` (${needsReview})` : ""}`}
+            label={`Run review autopilot${rep.unanswered ? ` (${rep.unanswered})` : ""}`}
             runningLabel="Drafting replies…"
           />
           <AutopilotButton
@@ -100,27 +90,51 @@ export default async function DashboardPage() {
             runningLabel="Drafting messages…"
           />
         </div>
+      </header>
+
+      <div className="mt-5 grid grid-cols-2 gap-3 lg:grid-cols-4">
+        <StatTile value={rep.flagged} label="Held for you" tone="brick" sub="Never auto-sent" />
+        <StatTile
+          value={rep.drafted + rep.followUpsDrafted}
+          label="Drafts ready"
+          tone="ochre"
+          sub={`${rep.drafted} replies · ${rep.followUpsDrafted} follow-ups`}
+        />
+        <StatTile value={rep.unanswered} label="Reviews unanswered" tone="rust" />
+        <StatTile
+          value={`${rep.coverage}%`}
+          label="Handled by autopilot"
+          tone="moss"
+          sub={`${rep.handled} of ${rep.reviews} reviews`}
+        />
       </div>
 
-      {/* The whole pitch in one row: work the autopilot already did, and the
-          one thing it deliberately left for a person. */}
-      <div className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-4">
-        <Stat value={heldForYou} label="Held for you" tone="brick" />
-        <Stat value={draftsReady} label="Drafts ready to send" tone="ochre" />
-        <Stat value={needsReview} label="Reviews unanswered" tone="rust" />
-        <Stat value={alreadySent} label="Sent" tone="moss" />
-      </div>
+      {guests.length === 0 && (
+        <div className="glass-card mt-6 rounded-panel border-dashed p-8 text-center text-sm text-ink-soft">
+          No guests yet. Run <code className="font-mono">npm run db:seed</code> to load demo data.
+        </div>
+      )}
 
-      <div className="mt-6 grid gap-4">
-        {ordered.map((guest: GuestRow) => (
-          <GuestTicketCard key={guest.id} guest={JSON.parse(JSON.stringify(guest))} />
-        ))}
-        {guests.length === 0 && (
-          <div className="glass-card rounded-panel border-dashed p-8 text-center text-sm text-ink-soft">
-            No guests yet. Run <code className="font-mono">npm run db:seed</code> to load demo data.
-          </div>
-        )}
-      </div>
+      {SECTIONS.map((section) => {
+        const list = grouped[section.key];
+        if (list.length === 0) return null;
+        return (
+          <section key={section.key} className="mt-7">
+            <div className="flex items-baseline gap-2.5">
+              <h2 className="text-[15px] font-bold text-ink">{section.title}</h2>
+              <span className="rounded-full border border-white/10 bg-white/[0.06] px-2 py-0.5 text-[11px] font-bold text-ink-soft">
+                {list.length}
+              </span>
+            </div>
+            <p className="mt-0.5 text-xs text-ink-soft">{section.hint}</p>
+            <div className="mt-3 grid gap-4">
+              {list.map((guest) => (
+                <GuestTicketCard key={guest.id} guest={guest as never} />
+              ))}
+            </div>
+          </section>
+        );
+      })}
     </div>
   );
 }

@@ -10,11 +10,19 @@ import { Thread } from "./Thread";
 
 const TABS = {
   "/dashboard/content": {
-    label: "Content calendar",
+    label: "Content Management",
     suggestions: [
       "Generate this week's posts",
       "Which posts are still waiting on me?",
       "Rewrite the seasonal caption, shorter and less salesy",
+    ],
+  },
+  "/dashboard/analytics": {
+    label: "Analytics",
+    suggestions: [
+      "Summarize how the autopilot is doing",
+      "Which tour brings in the most bookings?",
+      "What should I fix first?",
     ],
   },
   "/dashboard/settings": {
@@ -25,7 +33,7 @@ const TABS = {
     ],
   },
   "/dashboard": {
-    label: "Guest timeline",
+    label: "Reputation",
     suggestions: [
       "What needs my attention right now?",
       "Draft replies for every review that doesn't have one",
@@ -36,6 +44,7 @@ const TABS = {
 
 export function tabFor(pathname: string) {
   if (pathname.startsWith("/dashboard/content")) return TABS["/dashboard/content"];
+  if (pathname.startsWith("/dashboard/analytics")) return TABS["/dashboard/analytics"];
   if (pathname.startsWith("/dashboard/settings")) return TABS["/dashboard/settings"];
   return TABS["/dashboard"];
 }

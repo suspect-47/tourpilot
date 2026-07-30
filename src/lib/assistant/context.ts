@@ -9,11 +9,12 @@ import { prisma } from "@/lib/prisma";
  * be talking about a stale guest list, and the guest table is not exposed
  * to the client just to give the chat context.
  */
-export type AssistantTab = "timeline" | "content" | "settings";
+export type AssistantTab = "timeline" | "content" | "analytics" | "settings";
 
 export function resolveTab(pathname: string | undefined): AssistantTab {
   if (!pathname) return "timeline";
   if (pathname.startsWith("/dashboard/content")) return "content";
+  if (pathname.startsWith("/dashboard/analytics")) return "analytics";
   if (pathname.startsWith("/dashboard/settings")) return "settings";
   return "timeline";
 }
@@ -51,6 +52,28 @@ export async function buildTabSnapshot(
     );
     const drafted = items.filter((i) => i.status === "drafted").length;
     return `CONTENT QUEUE (${items.length} posts, ${drafted} awaiting approval):\n${lines.join("\n")}`;
+  }
+
+  if (tab === "analytics") {
+    const [guests, content] = await Promise.all([
+      prisma.guest.findMany({ where: { businessId } }),
+      prisma.contentItem.findMany({ where: { businessId } }),
+    ]);
+    const withReview = guests.filter((g) => g.reviewText);
+    const unanswered = withReview.filter((g) => g.reviewStatus === "none").length;
+    const handled = withReview.length - unanswered;
+    const mix = new Map<string, number>();
+    for (const g of guests) mix.set(g.tourType, (mix.get(g.tourType) ?? 0) + 1);
+    return `ANALYTICS TAB. Counted from this account's own rows; there is no social or review-platform integration, so no impressions, likes, or reach exist. Do not invent any.
+- guests: ${guests.length}
+- reviews: ${withReview.length} (positive ${withReview.filter((g) => g.reviewSentiment === "positive").length}, negative ${withReview.filter((g) => g.reviewSentiment === "negative").length})
+- reviews handled by autopilot: ${handled} of ${withReview.length}
+- flagged and held for a human: ${guests.filter((g) => g.reviewStatus === "flagged").length}
+- replies awaiting approval: ${guests.filter((g) => g.reviewStatus === "drafted").length}
+- replies sent: ${guests.filter((g) => g.reviewStatus === "sent").length}
+- follow-ups drafted: ${guests.filter((g) => g.reengagementStatus === "drafted").length}, sent: ${guests.filter((g) => g.reengagementStatus === "sent").length}
+- content queued: ${content.length} (${content.filter((c) => c.status === "drafted").length} awaiting approval)
+- bookings by tour: ${[...mix.entries()].map(([t, c]) => `${t} ${c}`).join(", ") || "none"}`;
   }
 
   if (tab === "settings") {
@@ -99,8 +122,10 @@ export function buildSystemPrompt(
   snapshot: string
 ): string {
   const where = {
-    timeline: "the Guest timeline, where every booking, review, and follow-up lives",
-    content: "the Content calendar, where social posts are queued for approval",
+    timeline:
+      "Reputation Management, where every review and follow-up is grouped by whether it needs them",
+    content: "Content Management, where social posts are queued for approval",
+    analytics: "Analytics, where the account's own counts are charted",
     settings: "the Billing tab",
   }[tab];
 
