@@ -6,7 +6,7 @@ Built for the Auth0 × Stripe Projects hackathon. **Hard deadline: demos at 5:30
 
 ## Stack
 
-Next.js 14 (App Router) · Prisma · Neon Postgres · Auth0 · Stripe Billing · Anthropic API · Tailwind
+Next.js 14 (App Router) · Prisma · Neon Postgres · Auth0 · Stripe Billing · OpenAI API · Tailwind
 
 ## Commands
 
@@ -23,15 +23,18 @@ npx tsc --noEmit     # type check
 
 Status flow: `none` → `drafted` → `approved` → `sent`, plus `flagged` for negative reviews the AI deliberately holds for a human.
 
-```
-src/lib/anthropic.ts        all three AI generators live here
+```text
+src/lib/ai.ts               all three AI generators live here
+src/lib/demoSession.ts      local-only auth bypass, see README
 src/app/api/autopilot/*     the three autopilot routes
+src/app/api/assistant/      the copilot rail's tool-calling endpoint
 src/app/dashboard/          guest timeline, content, settings
 src/components/             GuestTicketCard is the main UI unit
+src/components/shell/       dashboard chrome (nav, top bar)
 prisma/seed.ts              demo data
 ```
 
-## Ownership boundary — important
+## Ownership boundary (important)
 
 This is a 2-person team. **A teammate owns all Stripe billing and infrastructure provisioning.** Do not modify:
 
@@ -39,7 +42,7 @@ This is a 2-person team. **A teammate owns all Stripe billing and infrastructure
 - `src/app/api/stripe/**`
 - `src/app/dashboard/settings/page.tsx`
 - `src/components/UpgradeButton.tsx`
-- `.env` (managed by the Stripe Projects CLI — don't hand-edit)
+- `.env` (managed by the Stripe Projects CLI, don't hand-edit)
 
 If something in those files looks broken, say so rather than fixing it. Silent edits there create merge conflicts.
 
@@ -53,6 +56,8 @@ If something in those files looks broken, say so rather than fixing it. Silent e
 
 ## Where quality actually matters
 
-Judges will read the AI's output directly. Generic captions and replies lose. The single highest-leverage work in this repo is the prompts in `src/lib/anthropic.ts` — they should produce copy that sounds like a real small kayak company wrote it, not like a marketing tool.
+Judges will read the AI's output directly. Generic captions and replies lose. The single highest-leverage work in this repo is the prompts in `src/lib/ai.ts`. They should produce copy that sounds like a real small kayak company wrote it, not like a marketing tool.
+
+House copy rules, enforced in the prompts themselves: no em dashes, no corporate filler (there is a `BANNED_PHRASES` list with a final re-read pass), and every output must name something concrete the guest actually said.
 
 The `flagged` negative-review path is the strongest moment in the demo. It must work.

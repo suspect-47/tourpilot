@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
-import { getSession } from "@auth0/nextjs-auth0";
+import { getSessionOrDemo as getSession } from "@/lib/demoSession";
 import { prisma } from "@/lib/prisma";
-import { generateReviewReply } from "@/lib/anthropic";
+import { generateReviewReply } from "@/lib/ai";
 import { getOrCreateUserAndBusiness } from "@/lib/getCurrentBusiness";
 
 // Drafts (or re-drafts) an AI reply for every guest review that doesn't

@@ -1,13 +1,13 @@
 import { NextResponse } from "next/server";
-import { getSession } from "@auth0/nextjs-auth0";
+import { getSessionOrDemo as getSession } from "@/lib/demoSession";
 import { prisma } from "@/lib/prisma";
-import { generateReengagementMessage } from "@/lib/anthropic";
+import { generateReengagementMessage } from "@/lib/ai";
 import { getOrCreateUserAndBusiness } from "@/lib/getCurrentBusiness";
 
 const REENGAGE_AFTER_DAYS = 7;
 
 // Finds guests whose booking is old enough to follow up on and drafts
-// a personalized re-engagement message automatically — nobody has to
+// a personalized re-engagement message automatically, nobody has to
 // remember to check in on past guests.
 export async function POST() {
   const session = await getSession();

@@ -1,11 +1,11 @@
 import { NextResponse } from "next/server";
-import { getSession } from "@auth0/nextjs-auth0";
+import { getSessionOrDemo as getSession } from "@/lib/demoSession";
 import { prisma } from "@/lib/prisma";
-import { generateContentIdeas } from "@/lib/anthropic";
+import { generateContentIdeas } from "@/lib/ai";
 import { getOrCreateUserAndBusiness } from "@/lib/getCurrentBusiness";
 
 // Generates a fresh batch of social post ideas from the business
-// profile and recent positive reviews — a content calendar the owner
+// profile and recent positive reviews, a content calendar the owner
 // never had to sit down and write from scratch.
 export async function POST() {
   const session = await getSession();

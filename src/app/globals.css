@@ -2,43 +2,304 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ============================================================
+   Sunset Atelier · DARK ONLY
+   Glass material ported from the bucket_AI design system. There is
+   no light theme: these are the dark values, set unconditionally on
+   :root, and the root layout pins data-theme="dark" so shadcn and
+   assistant-ui `dark:` variants resolve.
+   ============================================================ */
+
+:root {
+  color-scheme: dark;
+
+  /* ── Espresso-night surfaces ─────────────────────────────── */
+  --surface: #2d2926; /* cards, lifted above the canvas */
+  --surface-sunken: #211e1c; /* app background */
+  --surface-muted: #332e2b; /* hover */
+  --surface-active: #3d2718; /* active, warm sunset */
+  --border-line: #38332e;
+  --text-primary: #f5efe6;
+  --text-secondary: #c3b9ab;
+  --text-tertiary: #a49a88;
+  --accent: #f6864a;
+  --accent-strong: #fba875;
+  --accent-btn: #c24a16;
+  --accent-surface: #3a2516;
+
+  /* ── Elevation ───────────────────────────────────────────────
+     On dark, cast shadows are nearly invisible, so a faint top
+     highlight plus a ring carries the depth instead. */
+  --shadow-e1: 0 1px 2px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.015);
+  --shadow-e2: 0 4px 14px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.02);
+  --shadow-e3: 0 14px 40px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.025);
+
+  /* ── Ambient mesh the glass refracts ─────────────────────── */
+  /* Alphas run hotter than the bucket_AI original: this dashboard is denser,
+     so more of the mesh is covered by panels and a faithful copy left the
+     glass with nothing to refract. */
+  --canvas-gradient:
+    radial-gradient(1300px 620px at 50% -10%, rgba(246, 134, 74, 0.16), transparent 64%),
+    radial-gradient(1100px 900px at 88% 104%, rgba(123, 29, 53, 0.32), transparent 62%),
+    radial-gradient(900px 760px at 0% 96%, rgba(246, 134, 74, 0.13), transparent 62%),
+    radial-gradient(700px 500px at 12% 8%, rgba(217, 45, 57, 0.1), transparent 60%);
+
+  /* ── Glass material ──────────────────────────────────────────
+     Dark glass brightens more and saturates less than light glass,
+     so the frost lifts off the night ground without washing out
+     the warm cast. */
+  --glass-surface: rgba(45, 41, 38, 0.44);
+  --glass-surface-strong: rgba(45, 41, 38, 0.64);
+  --glass-surface-subtle: rgba(45, 41, 38, 0.3);
+  /* Opaque fallbacks for browsers without backdrop-filter. */
+  --glass-surface-solid: #2a2623;
+  --glass-surface-strong-solid: #322d2a;
+  --glass-surface-subtle-solid: #262220;
+
+  --glass-border: rgba(255, 255, 255, 0.13);
+  --glass-blur: 24px;
+  --glass-blur-sm: 14px;
+  --glass-saturate: 150%;
+  --glass-bright: 1.12;
+  --glass-shadow:
+    0 4px 18px -13px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.09),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.18);
+  --shadow-glass-lift:
+    0 14px 34px -12px rgba(0, 0, 0, 0.58), 0 4px 12px -5px rgba(0, 0, 0, 0.44),
+    inset 0 1px 0 rgba(255, 255, 255, 0.14);
+
+  /* ── shadcn bridge ───────────────────────────────────────────
+     Mirrors of the Tailwind color scale. The Tailwind config is the
+     source of truth for utilities; these exist because a few shadcn
+     classNames reference the raw vars (color-mix, radius). */
+  --background: #211e1c;
+  --foreground: #f5efe6;
+  --primary: #c24a16;
+  --secondary: #332e2b;
+  --muted: #332e2b;
+  --destructive: #ff7466;
+  --radius: 10px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+}
+
 @layer base {
   ::selection {
-    background-color: theme("colors.ochre");
-    color: theme("colors.ink");
+    background-color: theme("colors.rust");
+    color: theme("colors.paper");
   }
   :focus-visible {
     outline: 2px solid theme("colors.rust");
     outline-offset: 2px;
+  }
+  /* shadcn and assistant-ui components assume an inherited border color. */
+  * {
+    border-color: theme("colors.line.DEFAULT");
+  }
+}
+
+/* ============================================================
+   Ambient canvas backdrop
+   Token-driven mesh painted behind the whole app so frosted
+   surfaces have something to blur against. Static gradient, no
+   animation, so it stays GPU-cheap.
+   ============================================================ */
+
+.canvas-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background: var(--canvas-gradient);
+}
+/* Fine frosted grain over the mesh, so the glass has texture to refract. */
+.canvas-backdrop::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  opacity: 0.05;
+  mix-blend-mode: soft-light;
+}
+
+/* ============================================================
+   Glass frost utilities
+   Tailwind's backdrop-blur-glass utility only emits blur(). These
+   unlayered rules add the saturation and brightness that make the
+   frost read as real glass. Unlayered wins over @layer utilities,
+   so these take precedence over the blur-only versions.
+   ============================================================ */
+
+.backdrop-blur-glass {
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate))
+    brightness(var(--glass-bright));
+  backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate))
+    brightness(var(--glass-bright));
+}
+.backdrop-blur-glass-sm {
+  -webkit-backdrop-filter: blur(var(--glass-blur-sm)) saturate(var(--glass-saturate))
+    brightness(var(--glass-bright));
+  backdrop-filter: blur(var(--glass-blur-sm)) saturate(var(--glass-saturate))
+    brightness(var(--glass-bright));
+}
+
+/* Baked vertical sheen on every glass surface, so panels read crisp
+   rather than flatly translucent. Gated on backdrop-filter support so
+   the solid fallback further down still wins where blur is missing. */
+@supports ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .bg-glass-surface-strong {
+    background-image: linear-gradient(180deg, rgba(52, 47, 43, 0.64), rgba(40, 36, 33, 0.5));
+  }
+  .bg-glass-surface {
+    background-image: linear-gradient(180deg, rgba(50, 45, 42, 0.46), rgba(40, 36, 33, 0.34));
+  }
+  .bg-glass-surface-subtle {
+    background-image: linear-gradient(180deg, rgba(48, 43, 40, 0.32), rgba(38, 34, 31, 0.22));
+  }
+}
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .bg-glass-surface {
+    background-color: var(--glass-surface-solid);
+  }
+  .bg-glass-surface-strong {
+    background-color: var(--glass-surface-strong-solid);
+  }
+  .bg-glass-surface-subtle {
+    background-color: var(--glass-surface-subtle-solid);
+  }
+}
+
+/* ============================================================
+   Glass holders
+   ============================================================ */
+
+.glass-card {
+  background-color: var(--glass-surface);
+  background-image: linear-gradient(180deg, rgba(50, 45, 42, 0.46), rgba(40, 36, 33, 0.34));
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-shadow), var(--shadow-e2);
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate))
+    brightness(var(--glass-bright));
+  backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate))
+    brightness(var(--glass-bright));
+}
+.glass-card--strong {
+  background-color: var(--glass-surface-strong);
+  background-image: linear-gradient(180deg, rgba(52, 47, 43, 0.64), rgba(40, 36, 33, 0.5));
+}
+
+/* Nested liquid glass, for elements sitting INSIDE a glass card. */
+.glass-inset {
+  background-color: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.07),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.16),
+    0 2px 10px -7px rgba(0, 0, 0, 0.5);
+  -webkit-backdrop-filter: blur(7px) saturate(150%);
+  backdrop-filter: blur(7px) saturate(150%);
+}
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .glass-card {
+    background-color: var(--glass-surface-solid);
+    background-image: none;
+  }
+  .glass-card--strong {
+    background-color: var(--glass-surface-strong-solid);
+  }
+  .glass-inset {
+    background-color: #2a2623;
+  }
+}
+
+/* App header glass, an Apple "liquid glass" capsule: almost no pigment,
+   legibility comes from heavy blur and saturation rather than a fill. */
+.app-header-glass {
+  background-color: rgba(30, 26, 23, 0.34);
+  background-image: linear-gradient(180deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.02));
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow:
+    0 5px 16px -14px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.09),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.18);
+  transition: box-shadow 0.2s ease, background-color 0.2s ease;
+}
+.app-header-glass.is-scrolled {
+  background-color: rgba(28, 24, 21, 0.5);
+}
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .app-header-glass {
+    background-color: var(--surface);
+  }
+}
+
+/* Hover lift for interactive glass. Animates transform and shadow only,
+   never blur, and is a no-op under reduced motion. */
+.glass-lift {
+  transition: transform 0.18s ease-out, box-shadow 0.18s ease-out,
+    border-color 0.15s ease-out, background-color 0.15s ease-out;
+  will-change: transform;
+}
+.glass-lift:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-glass-lift);
+}
+@media (prefers-reduced-motion: reduce) {
+  .glass-lift,
+  .glass-lift:hover {
+    transition: none;
+    transform: none;
   }
 }
 
 @layer components {
   /* The signature element: a guest record rendered as a ticket stub,
      with a perforated tear-line between the guest side and the
-     autopilot-action side — grounded in the literal tickets this
-     business issues. */
+     autopilot-action side, grounded in the literal tickets this
+     business issues. Now cut from frosted glass rather than paper. */
   .ticket {
     position: relative;
     display: grid;
     grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr);
-    background: theme("colors.paper-raised");
-    border: 1px solid theme("colors.ink" / 12%);
-    border-radius: 0.75rem;
-    overflow: hidden;
+    background-color: var(--glass-surface);
+    background-image: linear-gradient(180deg, rgba(50, 45, 42, 0.46), rgba(40, 36, 33, 0.34));
+    border: 1px solid var(--glass-border);
+    border-radius: theme("borderRadius.panel");
+    box-shadow: var(--glass-shadow), var(--shadow-e2);
+    -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate))
+      brightness(var(--glass-bright));
+    backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate))
+      brightness(var(--glass-bright));
   }
   @media (max-width: 768px) {
     .ticket {
       grid-template-columns: 1fr;
     }
   }
+
+  /* The flagged state is the loudest surface in the product: a negative
+     review the autopilot deliberately held back for a human. Crimson
+     wash and a brighter rim, so it reads as the app stopping on purpose. */
+  .ticket--flagged {
+    border-color: rgba(255, 116, 102, 0.42);
+    background-image: linear-gradient(180deg, rgba(123, 29, 53, 0.34), rgba(45, 41, 38, 0.4));
+    box-shadow:
+      0 4px 22px -12px rgba(217, 45, 57, 0.5), inset 0 1px 0 rgba(255, 180, 170, 0.18),
+      inset 0 -1px 0 rgba(0, 0, 0, 0.18);
+  }
+
+  /* Sits exactly on the column boundary: the grid is 1fr / 1.4fr, so the
+     seam is at 1 / 2.4 = 41.667%. The old 35% predated the wider panel and
+     cut through the guest quote in the left cell. */
   .ticket-perforation {
     position: absolute;
     top: 0;
     bottom: 0;
-    left: 35%;
+    left: 41.6667%;
     width: 0;
-    border-left: 2px dashed theme("colors.ink" / 20%);
+    border-left: 2px dashed rgba(255, 255, 255, 0.16);
   }
   @media (max-width: 768px) {
     .ticket-perforation {
@@ -61,4 +322,70 @@
   .ticket-perforation::after {
     bottom: -8px;
   }
+}
+
+/* ============================================================
+   Assistant rail
+   ============================================================ */
+
+/* Thin, warm scrollbar so the rail's own scroll does not punch a
+   bright system-grey stripe through the glass. */
+.rail-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.16) transparent;
+}
+.rail-scroll::-webkit-scrollbar {
+  width: 8px;
+}
+.rail-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+.rail-scroll::-webkit-scrollbar-thumb {
+  background-color: rgba(255, 255, 255, 0.16);
+  border-radius: 9999px;
+  border: 2px solid transparent;
+  background-clip: content-box;
+}
+.rail-scroll::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(255, 255, 255, 0.26);
+}
+
+/* Assistant message body: markdown rendered inside a glass bubble. */
+.aui-md > * + * {
+  margin-top: 0.6rem;
+}
+.aui-md ul,
+.aui-md ol {
+  padding-left: 1.15rem;
+  list-style: revert;
+}
+.aui-md li + li {
+  margin-top: 0.2rem;
+}
+.aui-md code {
+  font-family: theme("fontFamily.mono");
+  font-size: 0.8em;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 5px;
+  padding: 0.1em 0.35em;
+}
+.aui-md pre {
+  background: rgba(0, 0, 0, 0.32);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: theme("borderRadius.control");
+  padding: 0.7rem 0.8rem;
+  overflow-x: auto;
+}
+.aui-md pre code {
+  background: none;
+  padding: 0;
+}
+.aui-md a {
+  color: theme("colors.rust");
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.aui-md strong {
+  color: theme("colors.ink");
+  font-weight: 600;
 }

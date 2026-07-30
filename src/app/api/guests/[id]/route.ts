@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { getSession } from "@auth0/nextjs-auth0";
+import { getSessionOrDemo as getSession } from "@/lib/demoSession";
 import { prisma } from "@/lib/prisma";
 
 // Handles the human-in-the-loop actions on a guest's timeline:

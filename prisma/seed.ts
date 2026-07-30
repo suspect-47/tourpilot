@@ -31,8 +31,10 @@ async function main() {
       tourType: "Sunset Paddle",
       bookingDate: new Date(now - 2 * day),
       reviewText:
-        "Absolutely loved this! Our guide Marco knew every hidden cove and the sunset timing was perfect. Will book again.",
+        "Absolutely loved this. Marco timed it so we were rounding Pillar Point right as the sun dropped, and a harbor seal tailed us for a good ten minutes. Six of us total, felt like a private tour. Will book again.",
       reviewSentiment: "positive",
+      reviewReply:
+        "Priya, it sounds like Marco nailed the timing on that sunset. Having a harbor seal join your paddle is always a treat. We're glad it felt like a private tour for you and your group. Looking forward to welcoming you back.\n\nBlue Cove Kayak Tours",
       reviewStatus: "drafted",
     },
     {
@@ -44,6 +46,8 @@ async function main() {
       reviewText:
         "Kayaks were older and one had a slow leak, had to switch mid-tour. Guide handled it fine but felt disorganized.",
       reviewSentiment: "negative",
+      reviewReply:
+        "Derek, I'm really sorry about the kayak with the slow leak. That shouldn't have happened. We're replacing it rather than patching it again. Please contact us directly and we'll set up a free tour for you. I want you to see how this trip should have gone.\n\nBlue Cove Kayak Tours",
       reviewStatus: "flagged",
     },
     {
@@ -53,9 +57,12 @@ async function main() {
       tourType: "Kayak Tour",
       bookingDate: new Date(now - 3 * day),
       reviewText:
-        "Great intro tour, easy for beginners, kids had a blast. Would love more shade breaks next time.",
+        "First time in a kayak for all four of us and the kids (7 and 9) were comfortable within ten minutes. Guides were patient, and the water inside the breakwater stayed flat the whole morning. Only note, one more shade stop on the way back would have helped.",
       reviewSentiment: "positive",
-      reviewStatus: "drafted",
+      // Left unanswered on purpose so "Run review autopilot" has live work
+      // to do in the demo. Priya and Derek are pre-drafted so the timeline
+      // already looks worked when the page first opens.
+      reviewStatus: "none",
     },
     {
       ticketNo: "GST-0044",
@@ -63,6 +70,8 @@ async function main() {
       email: "sam@example.com",
       tourType: "Sunset Paddle",
       bookingDate: new Date(now - 9 * day),
+      reengagementDraft:
+        "Sam, it's been a week and a half since your Sunset Paddle. If you have a minute, a short review helps other people find us, and it means a lot to a three-guide operation like ours.\n\nBlue Cove Kayak Tours",
       reengagementStatus: "drafted",
     },
     {
@@ -92,7 +101,7 @@ async function main() {
       {
         businessId: business.id,
         caption:
-          "Sunset paddles are booking up fast this month — golden hour on the water hits different. 🌅",
+          "Sunset paddles are booking up fast this month. Golden hour off Pillar Point hits different. 🌅",
         theme: "seasonal",
         status: "drafted",
         scheduledFor: new Date(now + 1 * day),
@@ -100,7 +109,7 @@ async function main() {
       {
         businessId: business.id,
         caption:
-          '"Our guide knew every hidden cove" — this week\'s favorite from a Sunset Paddle guest.',
+          '"A harbor seal tailed us for a good ten minutes." This week\'s favorite line from a Sunset Paddle guest.',
         theme: "testimonial",
         status: "drafted",
         scheduledFor: new Date(now + 3 * day),

@@ -29,8 +29,14 @@ export function AutopilotButton({
     <button
       onClick={run}
       disabled={running}
-      className="rounded-lg bg-rust px-4 py-2 text-sm font-semibold text-paper-raised shadow-sm transition hover:bg-rust/90 disabled:opacity-60"
+      className="group inline-flex items-center gap-2 rounded-control bg-sunset px-4 py-2 text-sm font-semibold text-paper shadow-[0_6px_18px_-10px_rgba(246,134,74,0.9),inset_0_1px_0_rgba(255,255,255,0.35)] transition hover:bg-sunset-strong active:translate-y-px disabled:opacity-60"
     >
+      {running && (
+        <span
+          aria-hidden
+          className="h-3.5 w-3.5 shrink-0 animate-spin rounded-full border-2 border-paper/30 border-t-paper"
+        />
+      )}
       {running ? runningLabel : label}
     </button>
   );

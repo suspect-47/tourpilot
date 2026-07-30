@@ -1,4 +1,4 @@
-import { getSession } from "@auth0/nextjs-auth0";
+import { getSessionOrDemo as getSession } from "@/lib/demoSession";
 import { prisma } from "@/lib/prisma";
 import { getOrCreateUserAndBusiness } from "@/lib/getCurrentBusiness";
 import { ContentCard } from "@/components/ContentCard";
@@ -36,8 +36,8 @@ export default async function ContentPage() {
           <ContentCard key={item.id} item={JSON.parse(JSON.stringify(item))} />
         ))}
         {items.length === 0 && (
-          <div className="rounded-xl border border-dashed border-ink/20 p-8 text-center text-sm text-ink-soft md:col-span-2">
-            No posts yet — generate this week&apos;s batch above.
+          <div className="glass-card rounded-panel border-dashed p-8 text-center text-sm text-ink-soft md:col-span-2">
+            No posts yet. Generate this week&apos;s batch above.
           </div>
         )}
       </div>

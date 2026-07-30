@@ -21,8 +21,8 @@ export default async function SettingsPage() {
         {(Object.entries(TIERS) as [string, (typeof TIERS)[keyof typeof TIERS]][]).map(([key, tier]) => (
           <div
             key={key}
-            className={`rounded-xl border p-5 ${
-              currentTier === key ? "border-rust bg-paper-raised" : "border-ink/10 bg-paper-raised"
+            className={`glass-card glass-lift rounded-panel p-5 ${
+              currentTier === key ? "border-rust/60 shadow-[0_0_0_1px_rgba(246,134,74,0.25)]" : ""
             }`}
           >
             <p className="font-display text-lg font-semibold text-ink">{tier.label}</p>
@@ -32,7 +32,7 @@ export default async function SettingsPage() {
                 : `${tier.autoRepliesPerMonth} autopilot actions / month`}
             </p>
             {currentTier === key ? (
-              <span className="mt-4 inline-block rounded-md bg-ink/10 px-3 py-1.5 text-xs font-medium text-ink">
+              <span className="mt-4 inline-block rounded-control border border-white/12 bg-white/[0.06] px-3 py-1.5 text-xs font-medium text-ink">
                 Current plan
               </span>
             ) : key === "free" ? null : (
