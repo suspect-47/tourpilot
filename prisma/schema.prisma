@@ -1,4 +1,4 @@
-// TourPilot data model.
+// Inlet data model.
 // Guest is the core entity: every autopilot action (review reply,
 // re-engagement message) lives on the guest's timeline. ContentItem
 // is the one business-level (not guest-level) autopilot output.

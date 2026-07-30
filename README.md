@@ -1,4 +1,4 @@
-# TourPilot
+# Inlet
 
 Autonomous marketing co-pilot for tour & activity operators. Every guest
 booking lives on a timeline; review replies, re-engagement messages, and

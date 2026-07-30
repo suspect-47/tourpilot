@@ -41,7 +41,7 @@ export default function TopBar({
         </span>
         <span className="min-w-0">
           <span className="block text-[15px] font-bold leading-tight tracking-tight text-ink">
-            TourPilot
+            Inlet
           </span>
           <span className="block truncate text-[11px] leading-tight text-ink-soft">
             {businessName}

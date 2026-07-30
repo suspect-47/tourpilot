@@ -1,4 +1,4 @@
-# TourPilot handover: Person B to Person A
+# Inlet handover: Person B to Person A
 
 Written at the end of the product/demo half of the build. Covers what works, what is blocked on you, what I deliberately did not touch, and what was left unbuilt.
 
@@ -66,7 +66,7 @@ Two properties that make it safe to have on main:
 
 To remove it entirely: delete `src/lib/demoSession.ts` and change the import in these 10 files back to `import { getSession } from "@auth0/nextjs-auth0";`
 
-```
+```text
 src/app/page.tsx
 src/app/dashboard/layout.tsx
 src/app/dashboard/page.tsx

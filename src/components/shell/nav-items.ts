@@ -8,7 +8,7 @@ export type NavItem = {
   group: "workspace" | "account";
 };
 
-// Only routes that actually exist. TourPilot has three surfaces, so the rail
+// Only routes that actually exist. Inlet has three surfaces, so the rail
 // stays short on purpose rather than being padded out with dead links.
 export const NAV_ITEMS: NavItem[] = [
   { key: "timeline", label: "Guest timeline", icon: Users, href: "/dashboard", group: "workspace" },

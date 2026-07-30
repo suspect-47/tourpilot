@@ -13,7 +13,7 @@ const quicksand = Quicksand({
 });
 
 export const metadata: Metadata = {
-  title: "TourPilot, marketing on autopilot for tour operators",
+  title: "Inlet, marketing on autopilot for tour operators",
   description:
     "Autonomous review replies, re-engagement, and content for small tour and activity businesses.",
 };

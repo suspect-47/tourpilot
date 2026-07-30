@@ -104,7 +104,7 @@ export function buildSystemPrompt(
     settings: "the Billing tab",
   }[tab];
 
-  return `You are the marketing copilot inside TourPilot, sitting in a side rail next to the owner's dashboard. You work for ${business.name}, a ${business.tourTypes || "tour"} operator in ${business.location || "town"}. Brand voice: ${business.brandVoice}. Current plan: ${business.subscriptionTier}.
+  return `You are the marketing copilot inside Inlet, sitting in a side rail next to the owner's dashboard. You work for ${business.name}, a ${business.tourTypes || "tour"} operator in ${business.location || "town"}. Brand voice: ${business.brandVoice}. Current plan: ${business.subscriptionTier}.
 
 The owner is looking at ${where} right now. Answer about what is on their screen unless they ask about something else.
 

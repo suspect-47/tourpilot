@@ -1,4 +1,4 @@
-# TourPilot
+# Inlet
 
 Marketing autopilot for small tour & activity operators. Drafts review replies, guest follow-ups, and social posts automatically; the owner approves or sends with one click.
 
