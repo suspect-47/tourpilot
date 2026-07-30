@@ -6,7 +6,7 @@ import type { Config } from "tailwindcss";
  * `darkMode` is wired to `[data-theme="dark"]`, which the root layout always
  * sets, so shadcn/assistant-ui `dark:` variants resolve correctly.
  *
- * The original TourPilot token names (ink / paper / rust / ochre / moss /
+ * The original Inlet token names (ink / paper / rust / ochre / moss /
  * brick) are kept and re-pointed at dark sunset values rather than renamed.
  * The semantics survive the inversion (ink is still "text", paper is still
  * "ground"), so every existing `border-ink/10`-style className keeps working
@@ -18,7 +18,7 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        // ── TourPilot tokens, re-pointed to dark sunset ──────────────
+        // ── Inlet tokens, re-pointed to dark sunset ──────────────────
         ink: "#F5EFE6", // warm cream: primary text
         "ink-soft": "#C3B9AB", // secondary text, brightened for glass legibility
         paper: "#211E1C", // app ground

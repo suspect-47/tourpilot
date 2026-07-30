@@ -7,8 +7,8 @@ import { AssistantPanel, AssistantProvider } from "@/components/assistant/Assist
 import ShellNav from "./ShellNav";
 import TopBar from "./TopBar";
 
-const NAV_KEY = "tourpilot.navCollapsed";
-const RAIL_KEY = "tourpilot.railOpen";
+const NAV_KEY = "inlet.navCollapsed";
+const RAIL_KEY = "inlet.railOpen";
 
 const NAV_W_OPEN = 222;
 const NAV_W_COLLAPSED = 68;

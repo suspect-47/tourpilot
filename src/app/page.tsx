@@ -8,7 +8,7 @@ export default async function Home() {
   return (
     <div className="flex min-h-screen flex-col">
       <header className="mx-auto flex w-full max-w-6xl items-center justify-between px-6 py-6">
-        <p className="font-display text-lg font-semibold text-ink">TourPilot</p>
+        <p className="font-display text-lg font-semibold text-ink">Inlet</p>
         <a
           href="/api/auth/login"
           className="app-header-glass rounded-control px-4 py-2 text-sm font-medium text-ink transition hover:bg-white/10"
@@ -25,7 +25,7 @@ export default async function Home() {
           You&apos;re out running the tour. Your marketing shouldn&apos;t wait for you to get back.
         </h1>
         <p className="mt-5 max-w-xl text-base leading-relaxed text-ink-soft">
-          TourPilot drafts your review replies, follows up with past guests, and writes your next
+          Inlet drafts your review replies, follows up with past guests, and writes your next
           week of social posts, automatically. You approve or send with one click, or let it run.
         </p>
         <div className="mt-8">
