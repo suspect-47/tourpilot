@@ -1,0 +1,74 @@
+// TourPilot data model.
+// Guest is the core entity: every autopilot action (review reply,
+// re-engagement message) lives on the guest's timeline. ContentItem
+// is the one business-level (not guest-level) autopilot output.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Business {
+  id               String   @id @default(cuid())
+  name             String
+  description      String   @default("")
+  brandVoice       String   @default("warm, friendly, a little adventurous")
+  location         String   @default("")
+  tourTypes        String   @default("") // comma-separated, e.g. "kayak tours, sunset paddles"
+  stripeCustomerId String?
+  subscriptionTier String   @default("free") // free | starter | pro
+  createdAt        DateTime @default(now())
+
+  users        User[]
+  guests       Guest[]
+  contentItems ContentItem[]
+}
+
+model User {
+  id         String   @id @default(cuid())
+  auth0Id    String   @unique
+  email      String
+  name       String?
+  role       String   @default("owner") // owner | staff
+  businessId String
+  business   Business @relation(fields: [businessId], references: [id])
+  createdAt  DateTime @default(now())
+}
+
+model Guest {
+  id          String   @id @default(cuid())
+  businessId  String
+  business    Business @relation(fields: [businessId], references: [id])
+  ticketNo    String // e.g. "GST-0042", cosmetic ticket-stub numbering
+  name        String
+  email       String
+  tourType    String
+  bookingDate DateTime
+
+  // Review Autopilot
+  reviewText      String?
+  reviewSentiment String? // positive | negative | neutral
+  reviewReply     String?
+  reviewStatus    String  @default("none") // none | drafted | approved | sent | flagged
+
+  // Re-engagement Autopilot
+  reengagementDraft  String?
+  reengagementStatus String  @default("not_due") // not_due | drafted | approved | sent
+
+  createdAt DateTime @default(now())
+}
+
+model ContentItem {
+  id           String   @id @default(cuid())
+  businessId   String
+  business     Business @relation(fields: [businessId], references: [id])
+  caption      String
+  theme        String // e.g. "seasonal", "testimonial", "local-event"
+  status       String   @default("drafted") // drafted | approved
+  scheduledFor DateTime
+  createdAt    DateTime @default(now())
+}
