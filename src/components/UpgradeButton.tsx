@@ -21,7 +21,7 @@ export function UpgradeButton({ tier }: { tier: "starter" | "pro" }) {
     <button
       onClick={upgrade}
       disabled={loading}
-      className="rounded-md bg-rust px-3 py-1.5 text-xs font-semibold text-paper-raised hover:bg-rust/90 disabled:opacity-60"
+      className="rounded-control bg-sunset px-3 py-1.5 text-xs font-semibold text-paper transition hover:bg-sunset-strong disabled:opacity-60"
     >
       {loading ? "Redirecting…" : `Upgrade to ${tier}`}
     </button>

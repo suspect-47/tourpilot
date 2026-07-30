@@ -29,24 +29,24 @@ export function ContentCard({ item: initial }: { item: ContentItem }) {
   const date = new Date(item.scheduledFor).toLocaleDateString("en-US", { month: "short", day: "numeric" });
 
   return (
-    <div className="rounded-xl border border-ink/10 bg-paper-raised p-4">
-      <div className="flex items-center justify-between">
-        <span className="font-mono text-xs uppercase tracking-wide text-ink-soft">
+    <div className="glass-card glass-lift rounded-panel p-5">
+      <div className="flex items-center justify-between gap-3">
+        <span className="text-xs font-semibold uppercase tracking-wide text-ink-soft">
           {item.theme} · {date}
         </span>
         <StatusBadge status={item.status} />
       </div>
       {editing ? (
-        <div className="mt-2">
+        <div className="mt-3">
           <textarea
-            className="w-full rounded-md border border-ink/15 bg-paper p-2 text-sm text-ink"
+            className="glass-inset w-full rounded-control p-2.5 text-sm text-ink outline-none focus:border-rust/50"
             rows={3}
             value={draft}
             onChange={(e) => setDraft(e.target.value)}
           />
-          <div className="mt-1.5 flex gap-2">
+          <div className="mt-2 flex gap-2">
             <button
-              className="rounded-md bg-ink px-2.5 py-1 text-xs font-medium text-paper-raised"
+              className="rounded-control bg-sunset px-2.5 py-1 text-xs font-semibold text-paper transition hover:bg-sunset-strong"
               onClick={() => {
                 patch("edit", draft);
                 setEditing(false);
@@ -55,7 +55,7 @@ export function ContentCard({ item: initial }: { item: ContentItem }) {
               Save
             </button>
             <button
-              className="rounded-md border border-ink/20 px-2.5 py-1 text-xs font-medium text-ink-soft"
+              className="rounded-control border border-white/12 px-2.5 py-1 text-xs font-medium text-ink-soft transition hover:bg-white/[0.06]"
               onClick={() => setEditing(false)}
             >
               Cancel
@@ -63,20 +63,20 @@ export function ContentCard({ item: initial }: { item: ContentItem }) {
           </div>
         </div>
       ) : (
-        <p className="mt-2 text-sm leading-snug text-ink">{item.caption}</p>
+        <p className="mt-3 text-sm leading-relaxed text-ink">{item.caption}</p>
       )}
       {!editing && (
-        <div className="mt-3 flex gap-2">
+        <div className="mt-4 flex gap-2">
           {item.status !== "approved" && (
             <button
-              className="rounded-md border border-moss/40 px-2.5 py-1 text-xs font-medium text-moss hover:bg-moss/10"
+              className="rounded-control border border-moss/40 bg-moss/10 px-2.5 py-1 text-xs font-medium text-moss transition hover:bg-moss/20"
               onClick={() => patch("approve")}
             >
               Approve
             </button>
           )}
           <button
-            className="rounded-md border border-ink/15 px-2.5 py-1 text-xs font-medium text-ink-soft hover:bg-ink/5"
+            className="rounded-control border border-white/12 px-2.5 py-1 text-xs font-medium text-ink-soft transition hover:bg-white/[0.06] hover:text-ink"
             onClick={() => setEditing(true)}
           >
             Edit
