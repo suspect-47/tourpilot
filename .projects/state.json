@@ -1,0 +1,33 @@
+{
+  "version": 1,
+  "providers": {
+    "auth0": {
+      "name": "Auth0"
+    },
+    "neon": {
+      "name": "Neon"
+    }
+  },
+  "resources": {
+    "auth0-plan": {
+      "name": "auth0-plan",
+      "providerName": "Auth0",
+      "serviceId": "free"
+    },
+    "neon-plan": {
+      "name": "neon-plan",
+      "providerName": "Neon",
+      "serviceId": "free"
+    },
+    "neon-postgres": {
+      "name": "neon-postgres",
+      "providerName": "Neon",
+      "serviceId": "postgres"
+    },
+    "tourpilot": {
+      "name": "tourpilot",
+      "providerName": "Auth0",
+      "serviceId": "client"
+    }
+  }
+}

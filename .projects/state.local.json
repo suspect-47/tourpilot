@@ -1,0 +1,84 @@
+{
+  "version": 1,
+  "project": {
+    "catalog": "prod",
+    "initializedAt": "2026-07-30T21:48:20.120Z",
+    "merchantDisplayName": "Inlet",
+    "merchantId": "acct_1Tz1XZCQv1aEbmwM",
+    "projectId": "project_61V8Pljf67QWobv2e16V8PUwLnSQax46xsPLZz3cGMcy",
+    "projectName": "tourpilot"
+  },
+  "providers": {
+    "auth0": {
+      "accountRequestId": "facctrq_61V8Pt0vzrfi7LHHT16V8PUwLnSQax46xsPLZz3cG7qa",
+      "configuration": {
+        "locality": "us",
+        "naming_prefix": "tourpilot"
+      },
+      "linkedAt": "2026-07-30T21:55:56.269Z",
+      "providerId": "prvdr_61UVctyxfLOj4FpVw5Bmi",
+      "providerName": "Auth0",
+      "redirectUrl": null,
+      "requestedAt": "2026-07-30T21:55:56.269Z",
+      "status": "complete"
+    },
+    "neon": {
+      "accountRequestId": "facctrq_61V8PvkOqkwzRMxE316V8PUwLnSQax46xsPLZz3cGW1w",
+      "configuration": {},
+      "linkedAt": "2026-07-30T21:58:42.284Z",
+      "providerId": "prvdr_61UH8uNXFdoJUJOtT54AC",
+      "providerName": "Neon",
+      "redirectUrl": null,
+      "requestedAt": "2026-07-30T21:58:42.284Z",
+      "status": "complete"
+    }
+  },
+  "resources": {
+    "auth0-plan": {
+      "configuration": {},
+      "createdAt": "2026-07-30T21:56:00.089Z",
+      "lastRevealedAt": "2026-07-30T21:56:00.331Z",
+      "lastStatus": "complete",
+      "name": "auth0-plan",
+      "providerId": "prvdr_61UVctyxfLOj4FpVw5Bmi",
+      "providerName": "Auth0",
+      "resourceId": "fres_61V8Pt7VBknUpUXNH16V8PUwLnSQax46xsPLZz3cG61w",
+      "serviceId": "free"
+    },
+    "neon-plan": {
+      "configuration": {},
+      "createdAt": "2026-07-30T21:58:43.428Z",
+      "lastRevealedAt": "2026-07-30T21:58:43.782Z",
+      "lastStatus": "complete",
+      "name": "neon-plan",
+      "providerId": "prvdr_61UH8uNXFdoJUJOtT54AC",
+      "providerName": "Neon",
+      "resourceId": "fres_61V8PvmB4JnhqQep316V8PUwLnSQax46xsPLZz3cGMWO",
+      "serviceId": "free"
+    },
+    "neon-postgres": {
+      "configuration": {},
+      "createdAt": "2026-07-30T21:58:45.604Z",
+      "lastRevealedAt": "2026-07-30T21:58:46.077Z",
+      "lastStatus": "complete",
+      "name": "neon-postgres",
+      "providerId": "prvdr_61UH8uNXFdoJUJOtT54AC",
+      "providerName": "Neon",
+      "resourceId": "fres_61V8PvojQMnjDUjOZ16V8PUwLnSQax46xsPLZz3cGVSi",
+      "serviceId": "postgres"
+    },
+    "tourpilot": {
+      "configuration": {
+        "name": "tourpilot"
+      },
+      "createdAt": "2026-07-30T21:56:05.284Z",
+      "lastRevealedAt": "2026-07-30T21:56:05.514Z",
+      "lastStatus": "complete",
+      "name": "tourpilot",
+      "providerId": "prvdr_61UVctyxfLOj4FpVw5Bmi",
+      "providerName": "Auth0",
+      "resourceId": "fres_61V8PtB5xdergSV6w16V8PUwLnSQax46xsPLZz3cGEfI",
+      "serviceId": "client"
+    }
+  }
+}

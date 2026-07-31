@@ -1,0 +1,20 @@
+{
+  "version": "v2",
+  "auth0-plan": {},
+  "neon-plan": {
+    "org_id": "HGZkZqSKTwzHwBG1THKhNc386j1TNqZvGOtYj7o82kYI8AlWorCz+LW1VPShmgVgiyQ="
+  },
+  "neon-postgres": {
+    "branch_id": "LGJGMtGnJCtb0/QgJdCMmxroS0AjxUb8YejieYmCfsqykHRlY6ZSJmh50m5jb0pZH6YVKg==",
+    "branch_name": "Z7nG7swkBar9nuIT8pJ2bsdZVRLFaiBCVlb861VVq4SHhA==",
+    "connection_string": "UNOz00fFpI1ehUqtA/vqa/uZ1REs+W2m5CaLnRUe1A+eY97IkV3zazQJMb3UwODZZWVbxPhe/hXfLFa5hg06QbYjZ4V/CQNAi+2cHtV9LiXSbxTn/omKBszHX8D3YL8OfuUCEO6DmyFjPcrLs/HZgN5Iy+ZfaKtY+FP7RoHU/SgE+RMFergZsgbqjv2uUPS8AA==",
+    "database_name": "w1lkvpivikWM/cGtM9tbXucsxfbW8c/Mrnr/DByH3yMIzf/g",
+    "org_id": "NLQJrptINqbu+ygmAviVAoqGZWs3TsS0ZOJlNE0e2BAbe8EJvyHVzf2camNpma6Csbo=",
+    "project_id": "YqG1OrJK+PEva5+8s/Q/nYEiuefr7RJDshiZTYQXlEYzkCzBlekAZfOr2J69iV3VSA=="
+  },
+  "tourpilot": {
+    "client_id": "nD5PnB4A7TSyIVr5QXju/rRmSmbIcc7nvIyRuo4L7GfgbU/bEf2RsrUAw5pSaKumlBvoAgDAINF/vAiOXmI=",
+    "client_secret": "dBv/MKkvbWeteB6CwxWwpA8C++/o2rXyb2BNHT5bKwnc4sdmstWaGf0s6V34I+BeBt2PT5okRWtLHmBHCjOh22JI5GejYGGZ8/KhZ62lEYxmUjuU+K1aQH4W/mfuUg==",
+    "domain": "+nA1Fko9vzFt8cHXUl48h6A/qmWiIbeXDquEyevKQQgB4UX2WBUZRkJxVn0KfMBkAnEFGQ=="
+  }
+}
