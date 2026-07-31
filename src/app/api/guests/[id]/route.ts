@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { getSessionOrDemo as getSession } from "@/lib/demoSession";
 import { prisma } from "@/lib/prisma";
+import { getOrCreateUserAndBusiness } from "@/lib/getCurrentBusiness";
 
 // Handles the human-in-the-loop actions on a guest's timeline:
 // approving/sending a review reply or re-engagement draft, or
@@ -8,6 +9,8 @@ import { prisma } from "@/lib/prisma";
 export async function PATCH(req: Request, { params }: { params: { id: string } }) {
   const session = await getSession();
   if (!session?.user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+  const user = await getOrCreateUserAndBusiness(session.user.sub, session.user.email, session.user.name);
 
   const body = await req.json();
   const { action } = body as { action: string };
@@ -21,6 +24,14 @@ export async function PATCH(req: Request, { params }: { params: { id: string } }
   else if (action === "edit_reengagement") data.reengagementDraft = body.text;
   else return NextResponse.json({ error: "Unknown action" }, { status: 400 });
 
-  const guest = await prisma.guest.update({ where: { id: params.id }, data });
+  // Scope the write to the caller's own business, so a guest id belonging
+  // to another tenant can't be approved, edited, or sent.
+  const result = await prisma.guest.updateMany({
+    where: { id: params.id, businessId: user.businessId },
+    data,
+  });
+  if (result.count === 0) return NextResponse.json({ error: "Not found" }, { status: 404 });
+
+  const guest = await prisma.guest.findUnique({ where: { id: params.id } });
   return NextResponse.json(guest);
 }
