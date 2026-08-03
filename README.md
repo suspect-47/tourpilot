@@ -1,4 +1,4 @@
-# Inlet
+# Inlet (built by Abid Faisal & Dhruv Sapra)
 
 Autonomous marketing co-pilot for tour & activity operators. Every guest
 booking lives on a timeline; review replies, re-engagement messages, and
